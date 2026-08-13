@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+{% block meta_description %}Sign in to CamCo - your campus connect platform.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .auth-wrapper {
+    min-height: calc(100vh - 130px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+  }
+  .auth-header { margin-bottom: 2rem; }
+  .auth-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--cc-text);
+    margin-bottom: 0.35rem;
+  }
+  .auth-header p {
+    color: var(--cc-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--cc-muted);
+    font-size: 0.8rem;
+    margin: 1.5rem 0;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--cc-border);
+  }
+  .form-footer {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--cc-muted);
+  }
+  .form-footer a {
+    color: var(--cc-primary);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .form-footer a:hover { text-decoration: underline; }
+
+  /* Password toggle */
+  .input-group .form-control { border-right: 0; }
+  .input-group .btn-outline-secondary {
+    border: 1.5px solid var(--cc-border);
+    border-left: 0;
+    border-radius: 0 10px 10px 0;
+    color: var(--cc-muted);
+    background: transparent;
+    padding: 0 0.85rem;
+  }
+  .input-group .btn-outline-secondary:hover { background: #f1f5f9; }
+  .input-group .form-control:focus + .btn-outline-secondary,
+  .input-group .form-control:focus ~ * .btn-outline-secondary {
+    border-color: var(--cc-primary);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card cc-card cc-card-lg">
+
+    <!-- Header -->
+    <div class="auth-header">
+      <h1><i class="bi bi-person-circle me-2 text-primary"></i>Welcome back</h1>
+      <p>Sign in to your CamCo account to continue.</p>
+    </div>
+
+    <!-- Login Form -->
+    <form method="POST" action="{{ url_for('login') }}" novalidate id="loginForm">
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          placeholder="you@university.edu"
+          value="{{ request.form.get('email', '') }}"
+          required
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+            autocomplete="current-password"
+          />
+          <button class="btn btn-outline-secondary" type="button" id="togglePwd" tabindex="-1">
+            <i class="bi bi-eye" id="togglePwdIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me" />
+          <label class="form-check-label text-muted" style="font-size:.875rem;" for="remember_me">
+            Remember me
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary-cc w-100">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+      </button>
+
+    </form>
+
+    <div class="divider">or</div>
+
+    <div class="form-footer">
+      Don't have an account?
+      <a href="{{ url_for('register') }}">Create one — it's free</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const toggleBtn  = document.getElementById('togglePwd');
+  const pwdInput   = document.getElementById('password');
+  const toggleIcon = document.getElementById('togglePwdIcon');
+
+  toggleBtn.addEventListener('click', () => {
+    const isPassword = pwdInput.type === 'password';
+    pwdInput.type    = isPassword ? 'text' : 'password';
+    toggleIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+  });
+</script>
+{% endblock %}

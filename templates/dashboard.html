@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — {{ user.username }}{% endblock %}
+{% block meta_description %}{{ user.username }}'s CamCo student dashboard showing profile and interest tags.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .dashboard-wrapper {
+    padding: 2.5rem 0 4rem;
+  }
+
+  /* ---- Profile Hero Card ---- */
+  .profile-hero {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #7c3aed 100%);
+    border-radius: var(--cc-radius);
+    padding: 2.5rem 2.5rem 3.5rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    pointer-events: none;
+  }
+  .profile-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -30px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+  .avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .profile-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 0.15rem;
+  }
+  .profile-username {
+    opacity: 0.75;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .profile-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.825rem;
+    margin-top: 0.75rem;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ---- Stats row ---- */
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.825rem;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ---- Content cards that sit below the hero ---- */
+  .content-card {
+    background: var(--cc-card);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius);
+    box-shadow: var(--cc-shadow);
+    padding: 1.75rem;
+    height: 100%;
+  }
+  .content-card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cc-text);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .content-card-title i { color: var(--cc-primary); }
+
+  /* ---- Interest tags ---- */
+  .interest-tags { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+  .interest-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    cursor: default;
+  }
+  .interest-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  }
+
+  /* Rotating colour scheme for tags */
+  .tag-color-0 { background: #eff6ff; color: #1d4ed8; }
+  .tag-color-1 { background: #f5f3ff; color: #7c3aed; }
+  .tag-color-2 { background: #ecfdf5; color: #059669; }
+  .tag-color-3 { background: #fff7ed; color: #ea580c; }
+  .tag-color-4 { background: #fdf2f8; color: #db2777; }
+  .tag-color-5 { background: #f0fdf4; color: #16a34a; }
+  .tag-color-6 { background: #e0f2fe; color: #0369a1; }
+  .tag-color-7 { background: #fef9c3; color: #b45309; }
+
+  /* ---- Info list ---- */
+  .info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--cc-border);
+    font-size: 0.875rem;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--cc-primary);
+    font-size: 0.9rem;
+  }
+  .info-label {
+    font-size: 0.75rem;
+    color: var(--cc-muted);
+    margin: 0 0 0.1rem;
+    font-weight: 500;
+  }
+  .info-value {
+    font-weight: 500;
+    color: var(--cc-text);
+    margin: 0;
+  }
+
+  /* ---- Empty state ---- */
+  .empty-state {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--cc-muted);
+  }
+  .empty-state i { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+  .empty-state p { font-size: 0.875rem; margin: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-wrapper">
+
+  <!-- =========================================================
+       PROFILE HERO
+  ========================================================== -->
+  <div class="profile-hero mb-4">
+    <div class="d-flex align-items-start gap-3 flex-wrap">
+
+      <!-- Avatar (initials) -->
+      <div class="avatar">
+        {% set display = user.full_name or user.username %}
+        {% set parts = display.split() %}
+        {% if parts|length >= 2 %}
+          {{ parts[0][0]|upper }}{{ parts[1][0]|upper }}
+        {% else %}
+          {{ display[:2]|upper }}
+        {% endif %}
+      </div>
+
+      <div class="flex-grow-1">
+        <h1 class="profile-name">
+          {{ user.full_name or user.username }}
+        </h1>
+        <p class="profile-username">@{{ user.username }}</p>
+        <span class="profile-email">
+          <i class="bi bi-envelope-fill"></i>
+          {{ user.email }}
+        </span>
+      </div>
+
+      <!-- Stats -->
+      <div class="d-flex gap-2 flex-wrap align-self-start mt-1">
+        <span class="stat-pill">
+          <i class="bi bi-tags-fill"></i>
+          {{ tags|length }} interest{% if tags|length != 1 %}s{% endif %}
+        </span>
+        <span class="stat-pill">
+          <i class="bi bi-calendar3"></i>
+          Joined {{ user.created_at.strftime('%b %Y') }}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CONTENT GRID
+  ========================================================== -->
+  <div class="row g-4">
+
+    <!-- ---- Interests ---- -->
+    <div class="col-lg-8">
+      <div class="content-card">
+        <div class="content-card-title">
+          <i class="bi bi-tags-fill"></i> My Interest Tags
+        </div>
+
+        {% if tags %}
+          <div class="interest-tags">
+            {% for tag in tags %}
+              <span class="interest-tag tag-color-{{ loop.index0 % 8 }}">
+                <i class="bi bi-hash"></i>{{ tag[1:] }}
+              </span>
+            {% endfor %}
+          </div>
+          <p class="mt-3 mb-0" style="font-size:.825rem; color:var(--cc-muted);">
+            <i class="bi bi-lightbulb me-1"></i>
+            These tags help us connect you with peers who share your passions.
+          </p>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-tag-fill"></i>
+            <p>No interests added yet. Edit your profile to select some!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ---- Profile Details ---- -->
+    <div class="col-lg-4">
+      <div class="content-card">
+        <div class="content-card-title">
+          <i class="bi bi-person-lines-fill"></i> Profile Details
+        </div>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="bi bi-person-fill"></i></div>
+          <div>
+            <p class="info-label">Username</p>
+            <p class="info-value">@{{ user.username }}</p>
+          </div>
+        </div>
+
+        {% if user.full_name %}
+        <div class="info-row">
+          <div class="info-icon"><i class="bi bi-card-text"></i></div>
+          <div>
+            <p class="info-label">Full Name</p>
+            <p class="info-value">{{ user.full_name }}</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="info-row">
+          <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
+          <div>
+            <p class="info-label">Email</p>
+            <p class="info-value" style="word-break:break-all;">{{ user.email }}</p>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="bi bi-calendar-check-fill"></i></div>
+          <div>
+            <p class="info-label">Member Since</p>
+            <p class="info-value">{{ user.created_at.strftime('%d %B %Y') }}</p>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="bi bi-shield-check-fill"></i></div>
+          <div>
+            <p class="info-label">Account Status</p>
+            <p class="info-value">
+              <span class="badge" style="background:#dcfce7; color:#15803d; font-size:.78rem; font-weight:600; border-radius:6px;">
+                Active
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Logout Button -->
+        <div class="mt-3">
+          <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px; font-size:.875rem;">
+            <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
