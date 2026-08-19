@@ -4,143 +4,231 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}CamCo{% endblock %} — Campus Connect</title>
-  <meta name="description" content="{% block meta_description %}CamCo - Your campus community platform for students to connect, collaborate, and grow.{% endblock %}" />
-
-  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
+    /* =====================================================================
+       GLOBAL VARIABLES — Warm Palette
+    ===================================================================== */
     :root {
-      --cc-primary:    #2563eb;
-      --cc-primary-dk: #1d4ed8;
-      --cc-accent:     #7c3aed;
-      --cc-surface:    #f8fafc;
-      --cc-card:       #ffffff;
-      --cc-border:     #e2e8f0;
-      --cc-text:       #0f172a;
-      --cc-muted:      #64748b;
-      --cc-radius:     12px;
-      --cc-shadow:     0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
-      --cc-shadow-md:  0 4px 6px rgba(0,0,0,.07), 0 12px 28px rgba(0,0,0,.08);
+      --cc-bg:             #f4ede3;
+      --cc-card:           #fffdf7;
+      --cc-border:         #e2d5c3;
+      --cc-primary:        #5c68c2;
+      --cc-primary-dk:     #4a56b0;
+      --cc-accent:         #e07b54;
+      --cc-accent-lt:      #faf0eb;
+      --cc-sidebar-bg:     #1c2030;
+      --cc-sidebar-icon:   #7b84a3;
+      --cc-sidebar-active: #e07b54;
+      --cc-text:           #2a1f14;
+      --cc-muted:          #8a7a6a;
+      --cc-success:        #5a9e6f;
+      --cc-danger:         #c0392b;
+      --cc-radius:         12px;
+      --cc-shadow:         0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+      --cc-shadow-md:      0 4px 6px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.07);
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--cc-surface);
+      background: var(--cc-bg);
       color: var(--cc-text);
+      display: flex;
+      flex-direction: row;
       min-height: 100vh;
+    }
+
+    /* =====================================================================
+       SIDEBAR  — no visible bar, icons float vertically centered
+    ===================================================================== */
+    .cc-sidebar {
+      width: 72px;
+      min-height: 100vh;
+      background: transparent;          /* hidden bar */
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;          /* icons vertically centred */
+      padding: 1.5rem 0;
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      z-index: 1040;
     }
 
-    /* ---- Navbar ---- */
-    .navbar-camco {
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--cc-border);
-      padding: 0.75rem 0;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
     }
-    .navbar-brand-logo {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.35rem;
-      color: var(--cc-primary) !important;
-      letter-spacing: -0.5px;
-      text-decoration: none;
+
+    .sidebar-icon {
       display: flex;
       align-items: center;
-      gap: 0.45rem;
+      justify-content: center;
+      width: 50px; height: 50px;
+      border-radius: 14px;
+      color: #9a9eb8;                   /* visible on warm cream bg */
+      font-size: 1.55rem;               /* bigger icons */
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: color .2s, background .2s, transform .15s;
+      position: relative;
     }
-    .navbar-brand-logo .logo-dot {
-      display: inline-block;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--cc-accent);
+    .sidebar-icon:hover {
+      color: var(--cc-accent);
+      background: rgba(224,123,84,.1);
+      transform: scale(1.08);
     }
-    .nav-link-styled {
-      color: var(--cc-muted) !important;
-      font-size: 0.9rem;
-      font-weight: 500;
-      padding: 0.4rem 0.75rem !important;
-      border-radius: 8px;
-      transition: color .2s, background .2s;
-    }
-    .nav-link-styled:hover {
-      color: var(--cc-primary) !important;
-      background: #eff6ff;
-    }
-    .btn-nav-primary {
-      background: var(--cc-primary);
-      color: #fff !important;
-      font-size: 0.875rem;
-      font-weight: 600;
-      padding: 0.4rem 1rem !important;
-      border-radius: 8px;
-      transition: background .2s, transform .15s;
-    }
-    .btn-nav-primary:hover {
-      background: var(--cc-primary-dk);
-      transform: translateY(-1px);
+    .sidebar-icon.active {
+      color: var(--cc-accent);
+      background: rgba(224,123,84,.12);
     }
 
-    /* ---- Cards ---- */
+    /* Tooltip */
+    .sidebar-icon::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1c2030;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      padding: 0.3rem 0.7rem;
+      border-radius: 7px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+      z-index: 9999;
+    }
+    .sidebar-icon:hover::after { opacity: 1; }
+
+    /* Divider between main icons and profile */
+    .sidebar-divider {
+      width: 28px;
+      height: 1.5px;
+      background: rgba(0,0,0,.1);
+      border-radius: 2px;
+      margin: 0.5rem 0;
+    }
+
+    /* Profile avatar */
+    .sidebar-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cc-primary), var(--cc-accent));
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      border: 2.5px solid transparent;
+      position: relative;
+    }
+    .sidebar-avatar:hover,
+    .sidebar-avatar.active {
+      border-color: var(--cc-accent);
+      transform: scale(1.08);
+      box-shadow: 0 0 0 4px rgba(224,123,84,.15);
+    }
+    .sidebar-avatar::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1c2030;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      padding: 0.3rem 0.7rem;
+      border-radius: 7px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+      z-index: 9999;
+    }
+    .sidebar-avatar:hover::after { opacity: 1; }
+
+    /* =====================================================================
+       MAIN CONTENT
+    ===================================================================== */
+    .cc-main {
+      margin-left: 72px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--cc-bg);
+    }
+    /* Auth pages: no sidebar */
+    .cc-main-fullwidth {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--cc-bg);
+    }
+
+    /* =====================================================================
+       FLASH MESSAGES
+    ===================================================================== */
+    .flash-area { padding: 0.75rem 1.5rem 0; }
+    .alert {
+      border-radius: 10px;
+      font-size: 0.875rem;
+      border: none;
+      padding: 0.7rem 1rem;
+      background: var(--cc-card);
+      border-left: 4px solid var(--cc-primary);
+    }
+    .alert-success { border-left-color: var(--cc-success); }
+    .alert-danger  { border-left-color: var(--cc-danger);  }
+    .alert-warning { border-left-color: #d4a017;            }
+    .alert-info    { border-left-color: var(--cc-primary);  }
+
+    /* =====================================================================
+       SHARED CARD
+    ===================================================================== */
     .cc-card {
       background: var(--cc-card);
       border: 1px solid var(--cc-border);
       border-radius: var(--cc-radius);
       box-shadow: var(--cc-shadow);
-      padding: 2rem;
-    }
-    .cc-card-lg { padding: 2.5rem; }
-
-    /* ---- Flash messages ---- */
-    .flash-area { padding: 0.75rem 0 0; }
-    .alert {
-      border-radius: 10px;
-      font-size: 0.9rem;
-      border: none;
-      padding: 0.75rem 1rem;
     }
 
-    /* ---- Buttons ---- */
-    .btn-primary-cc {
-      background: var(--cc-primary);
-      color: #fff;
-      font-weight: 600;
-      border: none;
-      border-radius: 10px;
-      padding: 0.65rem 1.5rem;
-      font-size: 0.95rem;
-      transition: background .2s, transform .15s, box-shadow .2s;
-    }
-    .btn-primary-cc:hover {
-      background: var(--cc-primary-dk);
-      color: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(37,99,235,.35);
-    }
-    .btn-primary-cc:active { transform: translateY(0); }
-
-    /* ---- Form controls ---- */
+    /* =====================================================================
+       FORMS
+    ===================================================================== */
     .form-control, .form-select {
       border-radius: 10px;
       border: 1.5px solid var(--cc-border);
+      background: var(--cc-card);
       font-size: 0.9rem;
       padding: 0.6rem 0.9rem;
+      color: var(--cc-text);
       transition: border-color .2s, box-shadow .2s;
     }
     .form-control:focus, .form-select:focus {
       border-color: var(--cc-primary);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+      box-shadow: 0 0 0 3px rgba(92,104,194,.12);
+      background: var(--cc-card);
     }
     .form-label {
       font-weight: 500;
@@ -149,103 +237,584 @@
       margin-bottom: 0.35rem;
     }
 
-    /* ---- Footer ---- */
+    /* =====================================================================
+       VOTE BUTTONS (shared across feed & comments)
+    ===================================================================== */
+    .vote-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: none;
+      border: 1.5px solid var(--cc-border);
+      border-radius: 8px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cc-muted);
+      cursor: pointer;
+      transition: all .16s;
+    }
+    .vote-btn:hover { border-color: var(--cc-accent); color: var(--cc-accent); background: var(--cc-accent-lt); }
+    .vote-active-like    { border-color: #e07b54 !important; color: #e07b54 !important; background: #faf0eb !important; }
+    .vote-active-dislike { border-color: #c0392b !important; color: #c0392b !important; background: #fde8e8 !important; }
+
+    .comment-vote-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: none;
+      border: 1px solid var(--cc-border);
+      border-radius: 6px;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--cc-muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .comment-vote-btn:hover { border-color: var(--cc-accent); color: var(--cc-accent); }
+    .comment-vote-btn.vote-active-like    { border-color: #e07b54 !important; color: #e07b54 !important; background: #faf0eb !important; }
+    .comment-vote-btn.vote-active-dislike { border-color: #c0392b !important; color: #c0392b !important; background: #fde8e8 !important; }
+
+    /* =====================================================================
+       FOOTER
+    ===================================================================== */
     footer {
       margin-top: auto;
-      padding: 1.5rem 0;
+      padding: 1.25rem 1.5rem;
       border-top: 1px solid var(--cc-border);
-      font-size: 0.825rem;
+      font-size: 0.8rem;
       color: var(--cc-muted);
       text-align: center;
     }
 
-    /* ---- Main ---- */
-    main { flex: 1; }
+    /* =====================================================================
+       MODAL
+    ===================================================================== */
+    .modal-content {
+      border-radius: var(--cc-radius);
+      border: 1px solid var(--cc-border);
+      background: var(--cc-card);
+      box-shadow: var(--cc-shadow-md);
+    }
+    .modal-header { border-bottom: 1px solid var(--cc-border); padding: 1.25rem 1.5rem; }
+    .modal-body   { padding: 1.5rem; }
+    .modal-footer { border-top: 1px solid var(--cc-border); padding: 1rem 1.5rem; }
+    .modal-title  { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--cc-text); }
+
+    /* =====================================================================
+       BUTTONS
+    ===================================================================== */
+    .btn-cc-primary {
+      background: var(--cc-primary);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      padding: 0.6rem 1.4rem;
+      font-size: 0.9rem;
+      transition: background .2s, transform .15s;
+      cursor: pointer;
+    }
+    .btn-cc-primary:hover { background: var(--cc-primary-dk); color: #fff; transform: translateY(-1px); }
+
+    .btn-cc-accent {
+      background: var(--cc-accent);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      padding: 0.6rem 1.4rem;
+      font-size: 0.9rem;
+      transition: background .2s, transform .15s;
+      cursor: pointer;
+    }
+    .btn-cc-accent:hover { background: #c96a43; color: #fff; transform: translateY(-1px); }
+
+    /* Progress bar for wizard */
+    .wizard-progress {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 1.5rem;
+    }
+    .wizard-step-dot {
+      flex: 1;
+      height: 4px;
+      border-radius: 100px;
+      background: var(--cc-border);
+      transition: background .3s;
+    }
+    .wizard-step-dot.done   { background: var(--cc-success); }
+    .wizard-step-dot.active { background: var(--cc-primary); }
+
+    /* Step panels */
+    .wizard-panel { display: none; }
+    .wizard-panel.active { display: block; }
   </style>
 
   {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-  <!-- =========================================================
-       NAVBAR
-  ========================================================== -->
-  <nav class="navbar navbar-camco navbar-expand-lg">
-    <div class="container">
-      <a class="navbar-brand-logo" href="{{ url_for('index') }}">
-        <i class="bi bi-mortarboard-fill"></i>
-        CamCo
-        <span class="logo-dot"></span>
+  {% set ep = request.endpoint %}
+  {% set is_auth_page = ep in ('login', 'register') %}
+
+  {% if current_user.is_authenticated and not is_auth_page %}
+  <!-- =====================================================================
+       SIDEBAR
+  ===================================================================== -->
+  <aside class="cc-sidebar">
+    <nav class="sidebar-nav">
+
+      <a href="{{ url_for('feed') }}"
+         class="sidebar-icon {% if ep == 'feed' %}active{% endif %}"
+         data-tip="Feed">
+        <i class="bi bi-house-heart-fill"></i>
       </a>
 
-      <button class="navbar-toggler border-0" type="button"
-              data-bs-toggle="collapse" data-bs-target="#navMain">
-        <span class="navbar-toggler-icon"></span>
+      <a href="{{ url_for('hackathon') }}"
+         class="sidebar-icon {% if ep == 'hackathon' %}active{% endif %}"
+         data-tip="Team Finder">
+        <i class="bi bi-trophy-fill"></i>
+      </a>
+
+      <button class="sidebar-icon"
+              data-tip="Create Post"
+              data-bs-toggle="modal" data-bs-target="#createChoiceModal">
+        <i class="bi bi-plus-circle-fill"></i>
       </button>
 
-      <div class="collapse navbar-collapse" id="navMain">
-        <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
-          {% if current_user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link-styled" href="{{ url_for('dashboard') }}">
-                <i class="bi bi-grid-1x2 me-1"></i>Dashboard
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link-styled" href="{{ url_for('logout') }}">
-                <i class="bi bi-box-arrow-right me-1"></i>Logout
-              </a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link-styled" href="{{ url_for('login') }}">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="btn-nav-primary nav-link-styled" href="{{ url_for('register') }}">
-                Get Started
-              </a>
-            </li>
-          {% endif %}
-        </ul>
+      <a href="{{ url_for('messages') }}"
+         class="sidebar-icon {% if ep == 'messages' %}active{% endif %}"
+         data-tip="Messages">
+        <i class="bi bi-chat-square-dots-fill"></i>
+      </a>
+
+      <div class="sidebar-divider"></div>
+
+      <a href="{{ url_for('dashboard') }}"
+         class="sidebar-avatar {% if ep == 'dashboard' %}active{% endif %}"
+         data-tip="Profile">
+        {{ current_user.initials }}
+      </a>
+
+    </nav>
+  </aside>
+  {% endif %}
+
+  <!-- =====================================================================
+       MAIN
+  ===================================================================== -->
+  <div class="{% if current_user.is_authenticated and not is_auth_page %}cc-main{% else %}cc-main-fullwidth{% endif %}">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-area">
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+              <i class="bi bi-{% if cat=='success' %}check-circle{% elif cat=='danger' %}exclamation-triangle{% elif cat=='warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Content -->
+    <main style="flex:1;">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>&copy; 2024 CamCo — Campus Connect. Built for students, by students.</footer>
+  </div>
+
+
+  {% if current_user.is_authenticated and not is_auth_page %}
+  <!-- =====================================================================
+       CREATE CHOICE MODAL
+  ===================================================================== -->
+  <div class="modal fade" id="createChoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:360px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-primary"></i>What would you like to create?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body d-flex flex-column gap-3 py-3">
+          <button class="d-flex align-items-center gap-3 p-3 cc-card border-0 text-start w-100"
+                  style="border-radius:10px;cursor:pointer;transition:background .2s;"
+                  data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createConvoModal"
+                  onmouseover="this.style.background='#f4ede3'" onmouseout="this.style.background='var(--cc-card)'">
+            <div style="width:40px;height:40px;border-radius:10px;background:#eceef9;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="bi bi-chat-left-text-fill" style="color:var(--cc-primary);font-size:1.1rem;"></i>
+            </div>
+            <div>
+              <p style="font-weight:600;font-size:.9rem;margin:0;color:var(--cc-text);">Start a Conversation</p>
+              <p style="font-size:.8rem;color:var(--cc-muted);margin:0;">Ask a question or share ideas with the community</p>
+            </div>
+          </button>
+          <button class="d-flex align-items-center gap-3 p-3 cc-card border-0 text-start w-100"
+                  style="border-radius:10px;cursor:pointer;transition:background .2s;"
+                  data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#createHackModal"
+                  onmouseover="this.style.background='#f4ede3'" onmouseout="this.style.background='var(--cc-card)'">
+            <div style="width:40px;height:40px;border-radius:10px;background:#faf0eb;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="bi bi-trophy-fill" style="color:var(--cc-accent);font-size:1.1rem;"></i>
+            </div>
+            <div>
+              <p style="font-weight:600;font-size:.9rem;margin:0;color:var(--cc-text);">Find Hackathon Teammates</p>
+              <p style="font-size:.8rem;color:var(--cc-muted);margin:0;">Post your team details and invite members</p>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
-  </nav>
+  </div>
 
-  <!-- =========================================================
-       FLASH MESSAGES
-  ========================================================== -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="container flash-area">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% elif category == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <!-- =====================================================================
+       CREATE CONVERSATION MODAL
+  ===================================================================== -->
+  <div class="modal fade" id="createConvoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-chat-left-text me-2" style="color:var(--cc-primary);"></i>Start a Conversation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="POST" action="{{ url_for('create_post') }}">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Topic Tag <span class="text-danger">*</span></label>
+              <select class="form-select" name="tag" required>
+                <option value="" disabled selected>Choose a topic…</option>
+                {% set tags_list = ["#Python","#WebDev","#QuantumPhysics","#Cricket","#Hackathons","#MachineLearning","#OpenSource","#Robotics"] %}
+                {% for t in tags_list %}
+                  <option value="{{ t }}">{{ t }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="title" placeholder="e.g. How do list comprehensions work in Python?" minlength="5" required />
+            </div>
+            <div class="mb-1">
+              <label class="form-label">Description <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="body" rows="4" placeholder="Describe your question or thought in detail…" minlength="10" required></textarea>
+            </div>
           </div>
-        {% endfor %}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-size:.875rem;">Cancel</button>
+            <button type="submit" class="btn-cc-primary">
+              <i class="bi bi-send me-1"></i>Publish
+            </button>
+          </div>
+        </form>
       </div>
-    {% endif %}
-  {% endwith %}
-
-  <!-- =========================================================
-       MAIN CONTENT
-  ========================================================== -->
-  <main>
-    {% block content %}{% endblock %}
-  </main>
-
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
-  <footer>
-    <div class="container">
-      &copy; {{ 2024 }} CamCo — Campus Connect. Built for students, by students.
     </div>
-  </footer>
+  </div>
+
+  <!-- =====================================================================
+       CREATE HACKATHON MODAL (5-step wizard)
+  ===================================================================== -->
+  <div class="modal fade" id="createHackModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-trophy me-2" style="color:var(--cc-accent);"></i>Find Hackathon Teammates</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetHackWizard()"></button>
+        </div>
+        <form method="POST" action="{{ url_for('create_hackathon_post') }}" id="hackForm">
+        <div class="modal-body">
+
+          <!-- Progress dots -->
+          <div class="wizard-progress" id="hackProgress">
+            <div class="wizard-step-dot active" id="dot0"></div>
+            <div class="wizard-step-dot" id="dot1"></div>
+            <div class="wizard-step-dot" id="dot2"></div>
+            <div class="wizard-step-dot" id="dot3"></div>
+            <div class="wizard-step-dot" id="dot4"></div>
+          </div>
+
+          <!-- STEP 0: Hackathon & Team name -->
+          <div class="wizard-panel active" id="hstep0">
+            <p class="fw-semibold mb-3" style="color:var(--cc-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;">Step 1 of 5 — Hackathon Details</p>
+            <div class="mb-3">
+              <label class="form-label">Hackathon Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="hackathon_name" id="hackathon_name" placeholder="e.g. Smart India Hackathon 2024" required />
+            </div>
+            <div class="mb-1">
+              <label class="form-label">Team Name <span style="color:var(--cc-muted);font-weight:400;">(optional)</span></label>
+              <input type="text" class="form-control" name="team_name" placeholder="Leave blank if not decided yet" />
+            </div>
+          </div>
+
+          <!-- STEP 1: Topic -->
+          <div class="wizard-panel" id="hstep1">
+            <p class="fw-semibold mb-3" style="color:var(--cc-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;">Step 2 of 5 — Problem Statement</p>
+            <div class="mb-3">
+              <label class="form-label">Is the problem statement / topic decided?</label>
+              <div class="d-flex gap-2 mt-1">
+                <button type="button" class="topic-choice-btn" id="topicYes" onclick="setTopic(true)"
+                        style="flex:1;padding:.6rem;border:1.5px solid var(--cc-border);border-radius:10px;background:var(--cc-card);cursor:pointer;font-size:.875rem;font-weight:600;color:var(--cc-muted);transition:all .2s;">
+                  ✅ Yes, it's decided
+                </button>
+                <button type="button" class="topic-choice-btn" id="topicNo" onclick="setTopic(false)"
+                        style="flex:1;padding:.6rem;border:1.5px solid var(--cc-border);border-radius:10px;background:var(--cc-card);cursor:pointer;font-size:.875rem;font-weight:600;color:var(--cc-muted);transition:all .2s;">
+                  🤔 Not yet decided
+                </button>
+              </div>
+              <input type="hidden" name="topic_decided" id="topic_decided_input" value="no" />
+            </div>
+            <div id="topicFields" style="display:none;">
+              <div class="mb-3">
+                <label class="form-label">Theme / Domain <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="theme" id="theme_input" placeholder="e.g. Smart Agriculture, Healthcare AI…" />
+              </div>
+              <div class="mb-1">
+                <label class="form-label">Problem Statement <span class="text-danger">*</span></label>
+                <textarea class="form-control" name="problem_statement" id="ps_input" rows="3" placeholder="Describe the problem statement in detail…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Member counts -->
+          <div class="wizard-panel" id="hstep2">
+            <p class="fw-semibold mb-3" style="color:var(--cc-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;">Step 3 of 5 — Team Size</p>
+            <div class="mb-3">
+              <label class="form-label">Total Members Required <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" name="total_members" id="total_members" min="2" max="20" placeholder="e.g. 5" required />
+            </div>
+            <div class="mb-1">
+              <label class="form-label">Existing Members (including you) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" name="existing_members_count" id="exist_count" min="0" max="19" placeholder="e.g. 2" required />
+            </div>
+          </div>
+
+          <!-- STEP 3: Existing member details -->
+          <div class="wizard-panel" id="hstep3">
+            <p class="fw-semibold mb-3" style="color:var(--cc-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;">Step 4 of 5 — Existing Members</p>
+            <div id="memberFields">
+              <p style="color:var(--cc-muted);font-size:.875rem;">No existing members entered (count was 0).</p>
+            </div>
+          </div>
+
+          <!-- STEP 4: Leader + Skills -->
+          <div class="wizard-panel" id="hstep4">
+            <p class="fw-semibold mb-3" style="color:var(--cc-muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;">Step 5 of 5 — Leader & Skills</p>
+            <div class="mb-3" id="leaderSection">
+              <label class="form-label">Select Team Leader</label>
+              <div id="leaderOptions" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.35rem;">
+                <p style="color:var(--cc-muted);font-size:.875rem;">Add members in the previous step first.</p>
+              </div>
+              <input type="hidden" name="leader_index" id="leader_index_input" value="0" />
+            </div>
+            <div class="mb-1">
+              <label class="form-label">Required Skills / Expectations from New Member <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="required_skills" rows="3" placeholder="e.g. Flutter development, Figma, REST APIs, available for 3 days…" required></textarea>
+            </div>
+          </div>
+
+        </div><!-- /modal-body -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" id="hackBackBtn" style="border-radius:10px;font-size:.875rem;display:none;" onclick="hackStep(-1)">
+            <i class="bi bi-arrow-left me-1"></i>Back
+          </button>
+          <button type="button" class="btn-cc-primary" id="hackNextBtn" onclick="hackStep(1)">
+            Next <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+          <button type="submit" class="btn-cc-accent" id="hackSubmitBtn" style="display:none;">
+            <i class="bi bi-rocket-takeoff me-1"></i>Post It!
+          </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
 
   <!-- Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  /* =========================================================
+     AJAX VOTE  — no page reload, collapse stays open
+  ========================================================= */
+  async function castVote(type, id, value, container) {
+    const url = type === 'post' ? `/post/${id}/vote` : `/comment/${id}/vote`;
+    const fd  = new FormData();
+    fd.append('value', value);
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: fd
+      });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const likeBtn    = container.querySelector('[data-vote-val="1"]');
+      const dislikeBtn = container.querySelector('[data-vote-val="-1"]');
+      if (likeBtn)    likeBtn.querySelector('.vc').textContent    = data.likes;
+      if (dislikeBtn) dislikeBtn.querySelector('.vc').textContent = data.dislikes;
+      if (likeBtn) {
+        likeBtn.classList.toggle('vote-active-like',    data.my_vote === 1);
+        likeBtn.classList.toggle('vote-active-dislike', false);
+      }
+      if (dislikeBtn) {
+        dislikeBtn.classList.toggle('vote-active-dislike', data.my_vote === -1);
+        dislikeBtn.classList.toggle('vote-active-like',    false);
+      }
+    } catch(e) { console.error('Vote error', e); }
+  }
+
+  /* =========================================================
+     HACKATHON WIZARD
+  ========================================================= */
+  let hackCurrentStep = 0;
+  const HACK_TOTAL    = 5;
+  let topicDecided    = false;
+  let memberNames     = [];
+
+  function hackStep(dir) {
+    // Validate current step before going forward
+    if (dir === 1 && !validateHackStep(hackCurrentStep)) return;
+
+    // Prepare next step data
+    if (dir === 1 && hackCurrentStep === 2) buildMemberFields();
+    if (dir === 1 && hackCurrentStep === 3) buildLeaderOptions();
+
+    document.getElementById(`hstep${hackCurrentStep}`).classList.remove('active');
+    document.getElementById(`dot${hackCurrentStep}`).classList.remove('active');
+    document.getElementById(`dot${hackCurrentStep}`).classList.add('done');
+
+    hackCurrentStep += dir;
+    if (hackCurrentStep < 0) hackCurrentStep = 0;
+
+    document.getElementById(`hstep${hackCurrentStep}`).classList.add('active');
+    // Update dots
+    for (let i = 0; i < HACK_TOTAL; i++) {
+      const dot = document.getElementById(`dot${i}`);
+      dot.classList.remove('active','done');
+      if (i < hackCurrentStep)  dot.classList.add('done');
+      if (i === hackCurrentStep) dot.classList.add('active');
+    }
+
+    document.getElementById('hackBackBtn').style.display   = hackCurrentStep > 0 ? 'inline-flex' : 'none';
+    document.getElementById('hackNextBtn').style.display   = hackCurrentStep < HACK_TOTAL - 1 ? 'inline-flex' : 'none';
+    document.getElementById('hackSubmitBtn').style.display = hackCurrentStep === HACK_TOTAL - 1 ? 'inline-flex' : 'none';
+  }
+
+  function validateHackStep(step) {
+    if (step === 0) {
+      if (!document.getElementById('hackathon_name').value.trim()) {
+        alert('Please enter the hackathon name.'); return false;
+      }
+    }
+    if (step === 1) {
+      if (topicDecided) {
+        if (!document.getElementById('theme_input').value.trim()) {
+          alert('Please enter the theme.'); return false;
+        }
+        if (!document.getElementById('ps_input').value.trim()) {
+          alert('Please enter the problem statement.'); return false;
+        }
+      }
+    }
+    if (step === 2) {
+      const tot = parseInt(document.getElementById('total_members').value);
+      const ex  = parseInt(document.getElementById('exist_count').value);
+      if (!tot || tot < 2) { alert('Total members must be ≥ 2.'); return false; }
+      if (isNaN(ex) || ex < 0) { alert('Existing members cannot be negative.'); return false; }
+      if (ex >= tot) { alert('Existing members must be less than total members.'); return false; }
+    }
+    return true;
+  }
+
+  function setTopic(decided) {
+    topicDecided = decided;
+    document.getElementById('topic_decided_input').value = decided ? 'yes' : 'no';
+    document.getElementById('topicFields').style.display = decided ? 'block' : 'none';
+    ['theme_input','ps_input'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.required = decided;
+    });
+    const yBtn = document.getElementById('topicYes');
+    const nBtn = document.getElementById('topicNo');
+    yBtn.style.borderColor  = decided ? 'var(--cc-primary)' : 'var(--cc-border)';
+    yBtn.style.color        = decided ? 'var(--cc-primary)' : 'var(--cc-muted)';
+    yBtn.style.background   = decided ? '#eceef9' : 'var(--cc-card)';
+    nBtn.style.borderColor  = !decided ? 'var(--cc-accent)' : 'var(--cc-border)';
+    nBtn.style.color        = !decided ? 'var(--cc-accent)' : 'var(--cc-muted)';
+    nBtn.style.background   = !decided ? 'var(--cc-accent-lt)' : 'var(--cc-card)';
+  }
+
+  function buildMemberFields() {
+    const count  = parseInt(document.getElementById('exist_count').value) || 0;
+    const wrap   = document.getElementById('memberFields');
+    wrap.innerHTML = '';
+    memberNames  = [];
+    if (count === 0) {
+      wrap.innerHTML = '<p style="color:var(--cc-muted);font-size:.875rem;">No existing members (you will be the only one until teammates join).</p>';
+      return;
+    }
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement('div');
+      div.style.cssText = 'border:1px solid var(--cc-border);border-radius:10px;padding:1rem;margin-bottom:.75rem;background:var(--cc-bg);';
+      div.innerHTML = `
+        <p style="font-weight:600;font-size:.85rem;color:var(--cc-text);margin-bottom:.6rem;">Member ${i+1}</p>
+        <div class="mb-2">
+          <label class="form-label" style="font-size:.8rem;">Name</label>
+          <input type="text" class="form-control" name="member_name_${i}" id="mname_${i}" placeholder="Full name" style="font-size:.875rem;" />
+        </div>
+        <div>
+          <label class="form-label" style="font-size:.8rem;">Role / Description</label>
+          <input type="text" class="form-control" name="member_desc_${i}" placeholder="e.g. Frontend developer, 2nd year CSE" style="font-size:.875rem;" />
+        </div>`;
+      wrap.appendChild(div);
+    }
+  }
+
+  function buildLeaderOptions() {
+    const count = parseInt(document.getElementById('exist_count').value) || 0;
+    const wrap  = document.getElementById('leaderOptions');
+    wrap.innerHTML = '';
+    if (count === 0) {
+      wrap.innerHTML = '<p style="color:var(--cc-muted);font-size:.875rem;">No existing members to select as leader.</p>';
+      return;
+    }
+    for (let i = 0; i < count; i++) {
+      const nameEl = document.getElementById(`mname_${i}`);
+      const name   = nameEl ? (nameEl.value.trim() || `Member ${i+1}`) : `Member ${i+1}`;
+      const label  = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;gap:.6rem;padding:.5rem .75rem;border:1.5px solid var(--cc-border);border-radius:8px;cursor:pointer;font-size:.875rem;font-weight:500;background:var(--cc-card);transition:all .15s;';
+      label.innerHTML = `<input type="radio" name="_leader_radio" value="${i}" onchange="document.getElementById('leader_index_input').value=this.value;" ${i===0?'checked':''} style="accent-color:var(--cc-primary);"> ${name}`;
+      if (i === 0) label.style.borderColor = 'var(--cc-primary)';
+      label.querySelector('input').addEventListener('change', function() {
+        wrap.querySelectorAll('label').forEach(l => l.style.borderColor='var(--cc-border)');
+        label.style.borderColor = 'var(--cc-primary)';
+      });
+      wrap.appendChild(label);
+    }
+  }
+
+  function resetHackWizard() {
+    hackCurrentStep = 0;
+    topicDecided    = false;
+    document.getElementById('hackForm').reset();
+    document.querySelectorAll('.wizard-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+    for (let i = 0; i < 5; i++) {
+      const d = document.getElementById(`dot${i}`);
+      d.classList.remove('active','done');
+      if (i===0) d.classList.add('active');
+    }
+    document.getElementById('hackBackBtn').style.display   = 'none';
+    document.getElementById('hackNextBtn').style.display   = 'inline-flex';
+    document.getElementById('hackSubmitBtn').style.display = 'none';
+    document.getElementById('topicFields').style.display   = 'none';
+  }
+  </script>
+
   {% block extra_js %}{% endblock %}
 </body>
 </html>

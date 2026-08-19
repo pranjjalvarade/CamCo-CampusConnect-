@@ -1,270 +1,136 @@
 {% extends "base.html" %}
-
 {% block title %}Create Account{% endblock %}
-{% block meta_description %}Join CamCo - select your interests and connect with campus peers.{% endblock %}
 
 {% block extra_head %}
 <style>
-  .auth-wrapper {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2.5rem 1rem;
-  }
-  .auth-card {
-    width: 100%;
-    max-width: 560px;
-  }
-  .auth-header { margin-bottom: 2rem; }
-  .auth-header h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 0.35rem;
-  }
-  .auth-header p { color: var(--cc-muted); font-size: 0.9rem; margin: 0; }
-
-  /* ---- Interest Tags Grid ---- */
-  .interests-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.6rem;
-    margin-top: 0.5rem;
-  }
-  .interest-chip input[type="checkbox"] { display: none; }
-  .interest-chip label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 0.85rem;
-    border: 1.5px solid var(--cc-border);
-    border-radius: 100px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--cc-muted);
-    background: #fff;
-    transition: all .2s;
-    user-select: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .interest-chip label:hover {
-    border-color: var(--cc-primary);
-    color: var(--cc-primary);
-    background: #eff6ff;
-  }
-  .interest-chip input[type="checkbox"]:checked + label {
-    border-color: var(--cc-primary);
-    background: var(--cc-primary);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(37,99,235,.3);
-  }
-
-  /* ---- Counter badge ---- */
-  #tagCounter {
+  .interest-chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-top: 0.6rem;
-  }
-  .counter-pill {
-    background: #f1f5f9;
+    gap: .4rem;
+    padding: .35rem .85rem;
     border-radius: 100px;
-    padding: 0.2rem 0.6rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--cc-muted);
-    transition: background .2s, color .2s;
-  }
-  .counter-pill.ready {
-    background: #dcfce7;
-    color: #16a34a;
-  }
-  .counter-pill.warn {
-    background: #fef9c3;
-    color: #b45309;
-  }
-
-  /* ---- Password toggle ---- */
-  .input-group .form-control { border-right: 0; }
-  .input-group .btn-outline-secondary {
-    border: 1.5px solid var(--cc-border);
-    border-left: 0;
-    border-radius: 0 10px 10px 0;
-    color: var(--cc-muted);
-    background: transparent;
-    padding: 0 0.85rem;
-  }
-  .input-group .btn-outline-secondary:hover { background: #f1f5f9; }
-
-  /* ---- Section label ---- */
-  .section-label {
-    font-size: 0.875rem;
+    font-size: .82rem;
     font-weight: 600;
-    color: var(--cc-text);
-    margin-bottom: 0.35rem;
-    display: block;
-  }
-  .section-hint {
-    font-size: 0.8rem;
+    border: 1.5px solid var(--cc-border);
+    background: var(--cc-card);
     color: var(--cc-muted);
-    margin-bottom: 0;
+    cursor: pointer;
+    transition: all .18s;
+    user-select: none;
   }
-
-  .form-footer {
-    text-align: center;
-    margin-top: 1.25rem;
-    font-size: 0.875rem;
-    color: var(--cc-muted);
-  }
-  .form-footer a {
+  .interest-chip input { display: none; }
+  .interest-chip.selected {
+    border-color: var(--cc-primary);
+    background: #eceef9;
     color: var(--cc-primary);
-    font-weight: 500;
-    text-decoration: none;
   }
-  .form-footer a:hover { text-decoration: underline; }
+  .interest-chip:hover { border-color: var(--cc-primary); color: var(--cc-primary); }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-wrapper">
-  <div class="auth-card cc-card cc-card-lg">
+<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:var(--cc-bg);">
+  <div style="width:100%;max-width:560px;">
 
-    <!-- Header -->
-    <div class="auth-header">
-      <h1><i class="bi bi-stars me-2 text-primary"></i>Join CamCo</h1>
-      <p>Create your student profile and connect with the campus community.</p>
+    <!-- Brand -->
+    <div style="text-align:center;margin-bottom:1.75rem;">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--cc-primary),var(--cc-accent));margin-bottom:.85rem;">
+        <span style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;">CC</span>
+      </div>
+      <h1 style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--cc-text);margin:0 0 .2rem;">Join CamCo</h1>
+      <p style="font-size:.875rem;color:var(--cc-muted);margin:0;">Connect with your campus community</p>
     </div>
 
-    <!-- Registration Form -->
-    <form method="POST" action="{{ url_for('register') }}" novalidate id="registerForm">
-
-      <div class="row g-3 mb-3">
-        <div class="col-sm-6">
-          <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            name="username"
-            placeholder="e.g. john_doe"
-            value="{{ form_data.get('username', '') }}"
-            minlength="3"
-            required
-            autocomplete="username"
-          />
-        </div>
-        <div class="col-sm-6">
-          <label for="full_name" class="form-label">Full Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="full_name"
-            name="full_name"
-            placeholder="Your display name"
-            value="{{ form_data.get('full_name', '') }}"
-            autocomplete="name"
-          />
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          name="email"
-          placeholder="you@university.edu"
-          value="{{ form_data.get('email', '') }}"
-          required
-          autocomplete="email"
-        />
-      </div>
-
-      <div class="row g-3 mb-4">
-        <div class="col-sm-6">
-          <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-          <div class="input-group">
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              name="password"
-              placeholder="Min. 6 characters"
-              required
-              autocomplete="new-password"
-            />
-            <button class="btn btn-outline-secondary" type="button" id="togglePwd1" tabindex="-1">
-              <i class="bi bi-eye" id="togglePwdIcon1"></i>
-            </button>
-          </div>
-        </div>
-        <div class="col-sm-6">
-          <label for="confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
-          <div class="input-group">
-            <input
-              type="password"
-              class="form-control"
-              id="confirm_password"
-              name="confirm_password"
-              placeholder="Repeat password"
-              required
-              autocomplete="new-password"
-            />
-            <button class="btn btn-outline-secondary" type="button" id="togglePwd2" tabindex="-1">
-              <i class="bi bi-eye" id="togglePwdIcon2"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Interest Tags -->
-      <div class="mb-4">
-        <span class="section-label">
-          <i class="bi bi-tag-fill text-primary me-1"></i>
-          Your Interests <span class="text-danger">*</span>
-        </span>
-        <p class="section-hint mb-2">Pick at least <strong>3 tags</strong> that match your passions.</p>
-
-        <div class="interests-grid" id="interestsGrid">
-          {% for tag in interests %}
-          <div class="interest-chip">
-            <input
-              type="checkbox"
-              name="interests"
-              id="tag_{{ loop.index }}"
-              value="{{ tag }}"
-              {% if tag in selected_tags %}checked{% endif %}
-            />
-            <label for="tag_{{ loop.index }}">
-              <i class="bi bi-hash"></i>{{ tag[1:] }}
-            </label>
-          </div>
+    <div class="cc-card" style="padding:2rem;">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{ cat }} alert-dismissible fade show mb-3" role="alert" style="font-size:.85rem;">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
           {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" id="regForm">
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label">Username <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="username"
+                   value="{{ form_data.get('username','') }}"
+                   placeholder="e.g. pranjal_v" minlength="3" required />
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label">Full Name <span style="color:var(--cc-muted);font-weight:400;">(optional)</span></label>
+            <input type="text" class="form-control" name="full_name"
+                   value="{{ form_data.get('full_name','') }}"
+                   placeholder="Your full name" />
+          </div>
         </div>
 
-        <div id="tagCounter">
-          <span>Selected:</span>
-          <span class="counter-pill warn" id="counterPill">0 / 3 min</span>
+        <div class="mb-3">
+          <label class="form-label">Email Address <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" name="email"
+                 value="{{ form_data.get('email','') }}"
+                 placeholder="you@university.edu" required />
         </div>
-        <div id="tagError" class="text-danger mt-1" style="font-size:0.8rem; display:none;">
-          <i class="bi bi-exclamation-triangle me-1"></i>Please select at least 3 interests.
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label">Password <span class="text-danger">*</span></label>
+            <div style="position:relative;">
+              <input type="password" class="form-control" name="password" id="regPwd" placeholder="Min 6 characters" minlength="6" required style="padding-right:2.75rem;" />
+              <button type="button" onclick="togglePwd('regPwd','regEye1')"
+                      style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--cc-muted);cursor:pointer;font-size:1rem;padding:0;">
+                <i class="bi bi-eye-slash" id="regEye1"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+            <div style="position:relative;">
+              <input type="password" class="form-control" name="confirm_password" id="regPwd2" placeholder="Repeat password" required style="padding-right:2.75rem;" />
+              <button type="button" onclick="togglePwd('regPwd2','regEye2')"
+                      style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--cc-muted);cursor:pointer;font-size:1rem;padding:0;">
+                <i class="bi bi-eye-slash" id="regEye2"></i>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <button type="submit" class="btn btn-primary-cc w-100" id="submitBtn">
-        <i class="bi bi-person-plus me-2"></i>Create My Account
-      </button>
+        <!-- Interests -->
+        <div class="mb-3">
+          <label class="form-label">
+            Interests <span class="text-danger">*</span>
+            <span style="font-weight:400;color:var(--cc-muted);font-size:.8rem;">(select at least 3)</span>
+          </label>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem;" id="chipWrap">
+            {% for tag in interests %}
+            <label class="interest-chip {% if tag in selected_tags %}selected{% endif %}">
+              <input type="checkbox" name="interests" value="{{ tag }}"
+                     {% if tag in selected_tags %}checked{% endif %}
+                     onchange="updateCounter()" />
+              {{ tag }}
+            </label>
+            {% endfor %}
+          </div>
+          <p style="font-size:.8rem;margin-top:.5rem;color:var(--cc-muted);">
+            <span id="selCount">{{ selected_tags|length }}</span> selected
+            <span id="selMsg" style="color:var(--cc-danger);display:{% if selected_tags|length < 3 %}inline{% else %}none{% endif %};">
+              — pick at least 3
+            </span>
+          </p>
+        </div>
 
-    </form>
+        <button type="submit" class="btn-cc-primary w-100" id="regSubmit">
+          <i class="bi bi-person-plus me-2"></i>Create Account
+        </button>
+      </form>
 
-    <div class="form-footer mt-3">
-      Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+      <p style="text-align:center;font-size:.85rem;color:var(--cc-muted);margin-top:1.25rem;margin-bottom:0;">
+        Already have an account? <a href="{{ url_for('login') }}" style="color:var(--cc-primary);font-weight:600;text-decoration:none;">Sign in</a>
+      </p>
     </div>
 
   </div>
@@ -273,45 +139,30 @@
 
 {% block extra_js %}
 <script>
-  // --- Password toggle helpers ---
-  function makeToggle(btnId, iconId, inputId) {
-    document.getElementById(btnId).addEventListener('click', () => {
-      const input = document.getElementById(inputId);
-      const icon  = document.getElementById(iconId);
-      const show  = input.type === 'password';
-      input.type  = show ? 'text' : 'password';
-      icon.className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
-    });
-  }
-  makeToggle('togglePwd1', 'togglePwdIcon1', 'password');
-  makeToggle('togglePwd2', 'togglePwdIcon2', 'confirm_password');
+function togglePwd(fieldId, iconId) {
+  const f = document.getElementById(fieldId);
+  const i = document.getElementById(iconId);
+  if (f.type === 'password') { f.type='text'; i.className='bi bi-eye'; }
+  else { f.type='password'; i.className='bi bi-eye-slash'; }
+}
 
-  // --- Interest tag counter ---
-  const checkboxes  = document.querySelectorAll('input[name="interests"]');
-  const pill        = document.getElementById('counterPill');
-  const tagError    = document.getElementById('tagError');
-  const MIN_TAGS    = 3;
-
-  function updateCounter() {
-    const count = [...checkboxes].filter(c => c.checked).length;
-    pill.textContent = count < MIN_TAGS
-      ? `${count} / ${MIN_TAGS} min`
-      : `${count} selected ✓`;
-    pill.className = count >= MIN_TAGS ? 'counter-pill ready' : 'counter-pill warn';
-    tagError.style.display = 'none';
-  }
-
-  checkboxes.forEach(cb => cb.addEventListener('change', updateCounter));
-  updateCounter(); // run on page load (handles server-side re-render with checked state)
-
-  // --- Client-side form validation ---
-  document.getElementById('registerForm').addEventListener('submit', (e) => {
-    const count = [...checkboxes].filter(c => c.checked).length;
-    if (count < MIN_TAGS) {
-      e.preventDefault();
-      tagError.style.display = 'block';
-      document.getElementById('interestsGrid').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+function updateCounter() {
+  const checks = document.querySelectorAll('input[name="interests"]:checked');
+  const count  = checks.length;
+  document.getElementById('selCount').textContent = count;
+  document.getElementById('selMsg').style.display = count < 3 ? 'inline' : 'none';
+  // Toggle chip visual
+  document.querySelectorAll('.interest-chip').forEach(chip => {
+    chip.classList.toggle('selected', chip.querySelector('input').checked);
   });
+}
+
+document.getElementById('regForm').addEventListener('submit', function(e) {
+  const count = document.querySelectorAll('input[name="interests"]:checked').length;
+  if (count < 3) {
+    e.preventDefault();
+    alert('Please select at least 3 interests.');
+  }
+});
 </script>
 {% endblock %}

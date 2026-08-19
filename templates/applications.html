@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Applications{% endblock %}
+
+{% block extra_head %}
+<style>
+  .apps-wrap { padding: 1.5rem 1.75rem 4rem; max-width: 800px; margin: 0 auto; }
+  .page-title { font-family:'Space Grotesk',sans-serif; font-size:1.35rem; font-weight:700; margin:0 0 .2rem; color:var(--cc-text); }
+  .page-sub   { font-size:.875rem; color:var(--cc-muted); margin:0 0 1.5rem; }
+
+  /* Summary pills */
+  .summary-pills { display:flex; flex-wrap:wrap; gap:.45rem; margin-bottom:1.5rem; }
+  .s-pill { display:inline-flex; align-items:center; gap:.35rem; padding:.3rem .8rem; border-radius:100px; font-size:.8rem; font-weight:600; border:1.5px solid var(--cc-border); background:var(--cc-card); color:var(--cc-muted); }
+
+  /* Group header */
+  .group-hdr {
+    display:flex; align-items:center; gap:.65rem;
+    padding:.75rem 1.1rem;
+    background: linear-gradient(90deg, #eceef9, #faf0eb);
+    border:1px solid var(--cc-border);
+    border-radius: var(--cc-radius) var(--cc-radius) 0 0;
+    margin-top: 1.25rem;
+  }
+  .group-hdr h2 { font-family:'Space Grotesk',sans-serif; font-size:.9rem; font-weight:700; margin:0; color:var(--cc-text); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .group-count { background:var(--cc-accent); color:#fff; border-radius:100px; padding:.12rem .55rem; font-size:.75rem; font-weight:700; flex-shrink:0; }
+
+  /* App card */
+  .app-card { background:var(--cc-card); border:1px solid var(--cc-border); border-top:none; padding:.9rem 1.1rem; display:flex; gap:.9rem; align-items:flex-start; transition:background .15s; }
+  .app-card:last-child { border-radius:0 0 var(--cc-radius) var(--cc-radius); }
+  .app-card:not(:last-child) { border-bottom:1px solid #f0e8df; }
+  .app-card:hover { background: #fdf9f4; }
+
+  .app-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--cc-primary),var(--cc-accent)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; flex-shrink:0; font-family:'Space Grotesk',sans-serif; }
+  .app-info   { flex:1; min-width:0; }
+  .app-name   { font-weight:600; font-size:.88rem; color:var(--cc-text); margin:0 0 .1rem; }
+  .app-time   { font-size:.75rem; color:var(--cc-muted); margin:0 0 .45rem; }
+  .app-msg    { font-size:.84rem; color:#3d3128; line-height:1.55; background:var(--cc-bg); border:1px solid var(--cc-border); border-radius:8px; padding:.45rem .7rem; margin:0; white-space:pre-line; }
+
+  .badge-pending  { background:#fef9c3; color:#b45309; font-size:.75rem; font-weight:700; padding:.2rem .55rem; border-radius:6px; }
+  .badge-accepted { background:#dcfce7; color:#15803d; font-size:.75rem; font-weight:700; padding:.2rem .55rem; border-radius:6px; }
+  .badge-rejected { background:#fee2e2; color:#dc2626; font-size:.75rem; font-weight:700; padding:.2rem .55rem; border-radius:6px; }
+
+  .app-actions { display:flex; flex-direction:column; gap:.35rem; flex-shrink:0; }
+  .btn-accept  { background:var(--cc-success); color:#fff; border:none; border-radius:8px; padding:.3rem .8rem; font-size:.8rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:background .18s; }
+  .btn-accept:hover { background:#4a8a5f; }
+  .btn-reject  { background:var(--cc-card); color:var(--cc-danger); border:1.5px solid #fca5a5; border-radius:8px; padding:.3rem .8rem; font-size:.8rem; font-weight:600; cursor:pointer; white-space:nowrap; transition:all .18s; }
+  .btn-reject:hover { background:#fde8e8; }
+
+  .apps-empty { text-align:center; padding:4rem 1rem; color:var(--cc-muted); }
+  .apps-empty i { font-size:3rem; display:block; margin-bottom:.75rem; }
+  .apps-empty h3 { font-size:1.05rem; font-weight:600; margin-bottom:.4rem; color:var(--cc-text); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="apps-wrap">
+
+  <h1 class="page-title"><i class="bi bi-people-fill me-2" style="color:var(--cc-accent);"></i>Team Applications</h1>
+  <p class="page-sub">Review join requests for your hackathon posts.</p>
+
+  {% if total > 0 %}
+    <div class="summary-pills">
+      <span class="s-pill"><i class="bi bi-inbox"></i> {{ total }} total</span>
+      <span class="s-pill" style="color:#b45309;border-color:#fde68a;">
+        <i class="bi bi-clock"></i>
+        {{ grouped.values()|map('selectattr','status','equalto','pending')|map('list')|map('length')|sum }} pending
+      </span>
+      <span class="s-pill" style="color:var(--cc-success);border-color:#bbf7d0;">
+        <i class="bi bi-check-circle"></i>
+        {{ grouped.values()|map('selectattr','status','equalto','accepted')|map('list')|map('length')|sum }} accepted
+      </span>
+      <span class="s-pill" style="color:var(--cc-danger);border-color:#fecaca;">
+        <i class="bi bi-x-circle"></i>
+        {{ grouped.values()|map('selectattr','status','equalto','rejected')|map('list')|map('length')|sum }} rejected
+      </span>
+    </div>
+
+    {% for post_id, apps in grouped.items() %}
+      {% set post = post_map[post_id] %}
+      <div class="group-hdr">
+        <i class="bi bi-trophy-fill" style="color:var(--cc-accent);font-size:.95rem;"></i>
+        <h2 title="{{ post.display_title }}">{{ post.display_title }}</h2>
+        <span style="font-size:.72rem;font-weight:700;color:var(--cc-muted);">{{ post.hackathon_name }}</span>
+        <span class="group-count">{{ apps|length }}</span>
+      </div>
+
+      {% for app in apps %}
+      <div class="app-card">
+        <div class="app-avatar">{{ (app.applicant.full_name or app.applicant.username)[:2]|upper }}</div>
+        <div class="app-info">
+          <p class="app-name">
+            {{ app.applicant.full_name or app.applicant.username }}
+            <span style="color:var(--cc-muted);font-weight:400;"> @{{ app.applicant.username }}</span>
+          </p>
+          <p class="app-time">{{ app.timestamp.strftime('%d %b %Y, %H:%M') }}</p>
+          <p class="app-msg">{{ app.message }}</p>
+        </div>
+        <div class="app-actions">
+          <span class="badge-{{ app.status }}">
+            {% if app.status == 'pending' %}<i class="bi bi-clock me-1"></i>Pending
+            {% elif app.status == 'accepted' %}<i class="bi bi-check-circle me-1"></i>Accepted
+            {% else %}<i class="bi bi-x-circle me-1"></i>Rejected{% endif %}
+          </span>
+          {% if app.status == 'pending' %}
+            <form method="POST" action="{{ url_for('manage_application', app_id=app.id, action='accept') }}" style="margin:0;">
+              <button type="submit" class="btn-accept w-100"><i class="bi bi-check2 me-1"></i>Accept</button>
+            </form>
+            <form method="POST" action="{{ url_for('manage_application', app_id=app.id, action='reject') }}" style="margin:0;">
+              <button type="submit" class="btn-reject w-100"><i class="bi bi-x me-1"></i>Reject</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    {% endfor %}
+
+  {% else %}
+    <div class="apps-empty">
+      <i class="bi bi-people"></i>
+      <h3>No applications yet</h3>
+      <p>Applications to your <a href="{{ url_for('hackathon') }}" style="color:var(--cc-primary);">hackathon posts</a> will appear here.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

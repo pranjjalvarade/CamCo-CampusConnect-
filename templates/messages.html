@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;padding:2rem;text-align:center;">
+  <div style="background:var(--cc-card);border:1px solid var(--cc-border);border-radius:var(--cc-radius);box-shadow:var(--cc-shadow);padding:3.5rem 3rem;max-width:480px;width:100%;">
+    <i class="bi bi-chat-square-dots" style="font-size:4.5rem;color:var(--cc-border);display:block;margin-bottom:1.25rem;"></i>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--cc-text);margin-bottom:.5rem;">Messages</h1>
+    <div style="display:inline-flex;align-items:center;gap:.4rem;background:#fdf5ea;border:1px solid #f5ddb0;border-radius:8px;padding:.35rem .85rem;font-size:.82rem;font-weight:700;color:#b07a1a;margin-bottom:1.25rem;">
+      <i class="bi bi-cone-striped"></i> Coming Soon
+    </div>
+    <p style="font-size:.9rem;color:var(--cc-muted);line-height:1.7;margin:0;">
+      Personal messaging between students is currently being built.<br />
+      Check back soon — we're working hard on it! 🚧
+    </p>
+    <div style="margin-top:1.75rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ url_for('feed') }}" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--cc-primary);color:#fff;text-decoration:none;border-radius:10px;padding:.5rem 1.1rem;font-size:.875rem;font-weight:600;">
+        <i class="bi bi-house-heart-fill"></i> Back to Feed
+      </a>
+      <a href="{{ url_for('hackathon') }}" style="display:inline-flex;align-items:center;gap:.4rem;background:var(--cc-accent-lt);color:var(--cc-accent);border:1.5px solid #f5cdb0;text-decoration:none;border-radius:10px;padding:.5rem 1.1rem;font-size:.875rem;font-weight:600;">
+        <i class="bi bi-trophy-fill"></i> Team Finder
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

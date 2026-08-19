@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% block title %}Team Finder{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hack-wrap { padding: 1.5rem 1.75rem 4rem; max-width: 800px; margin: 0 auto; }
+
+  /* Top bar */
+  .hack-topbar { margin-bottom: 1.75rem; }
+  .hack-title  { font-family:'Space Grotesk',sans-serif; font-size:1.35rem; font-weight:700; margin:0 0 .2rem; color:var(--cc-text); }
+  .hack-sub    { font-size:.875rem; color:var(--cc-muted); margin:0; }
+
+  /* Post card */
+  .hack-card {
+    background: var(--cc-card);
+    border: 1px solid var(--cc-border);
+    border-radius: var(--cc-radius);
+    box-shadow: var(--cc-shadow);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: box-shadow .2s;
+    position: relative;
+  }
+  .hack-card:hover { box-shadow: var(--cc-shadow-md); }
+
+  /* Members needed badge — top left, small & muted */
+  .members-needed-badge {
+    position: absolute;
+    top: .7rem;
+    left: .9rem;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--cc-muted);
+    letter-spacing: .2px;
+  }
+
+  .hack-card-body { padding: 2.1rem 1.2rem 1rem; }
+
+  .hack-main-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--cc-text);
+    margin: 0 0 .15rem;
+  }
+  .hack-hackname {
+    font-size: .8rem;
+    color: var(--cc-muted);
+    margin: 0 0 .85rem;
+  }
+
+  /* Topic box */
+  .topic-box {
+    background: #f0f2fd;
+    border: 1px solid #d0d5f5;
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    margin-bottom: .85rem;
+  }
+  .topic-box-label { font-size:.73rem; font-weight:700; color:var(--cc-primary); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.35rem; }
+  .topic-box-theme { font-size:.85rem; font-weight:600; color:var(--cc-text); margin-bottom:.25rem; }
+  .topic-box-ps    { font-size:.84rem; color:#3d3128; line-height:1.6; margin:0; white-space:pre-line; }
+
+  /* No topic badge */
+  .no-topic-badge { display:inline-flex; align-items:center; gap:.35rem; background:#fdf5ea; border:1px solid #f5ddb0; border-radius:8px; padding:.3rem .75rem; font-size:.8rem; font-weight:600; color:#b07a1a; margin-bottom:.85rem; }
+
+  /* Members list */
+  .members-section { margin-bottom: .85rem; }
+  .members-label { font-size:.73rem; font-weight:700; color:var(--cc-muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.45rem; }
+  .member-chip  { display:inline-flex; align-items:center; gap:.4rem; background:var(--cc-bg); border:1px solid var(--cc-border); border-radius:8px; padding:.3rem .7rem; font-size:.82rem; font-weight:500; color:var(--cc-text); margin:.2rem; }
+  .leader-crown { color:#d4a017; }
+
+  /* Skills */
+  .skills-section { margin-bottom: .9rem; }
+  .skills-label { font-size:.73rem; font-weight:700; color:var(--cc-muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:.35rem; }
+  .skills-text  { font-size:.875rem; color:#3d3128; line-height:1.6; margin:0; }
+
+  /* Card footer */
+  .hack-card-footer {
+    padding: .7rem 1.2rem;
+    border-top: 1px solid var(--cc-border);
+    background: #fdf9f4;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+  }
+  .hack-author { font-size:.78rem; color:var(--cc-muted); }
+  .hack-author b { color:var(--cc-text); font-weight:600; }
+
+  /* Apply section */
+  .apply-collapse { padding: .9rem 1.2rem; border-top: 1px solid var(--cc-border); }
+  .apply-collapse textarea { width:100%; resize:none; font-size:.875rem; border-radius:10px; border:1.5px solid var(--cc-border); padding:.55rem .8rem; margin-bottom:.65rem; min-height:80px; background:var(--cc-card); color:var(--cc-text); transition:border-color .2s; }
+  .apply-collapse textarea:focus { outline:none; border-color:var(--cc-accent); box-shadow:0 0 0 3px rgba(224,123,84,.1); }
+  .btn-apply-submit { background:var(--cc-accent); color:#fff; border:none; border-radius:10px; padding:.5rem 1.25rem; font-size:.875rem; font-weight:600; cursor:pointer; transition:background .2s; }
+  .btn-apply-submit:hover { background:#c96a43; }
+
+  /* Buttons */
+  .btn-apply-open { display:inline-flex; align-items:center; gap:.35rem; background:var(--cc-accent); color:#fff; border:none; border-radius:8px; padding:.35rem .9rem; font-size:.82rem; font-weight:600; cursor:pointer; transition:background .2s; }
+  .btn-apply-open:hover { background:#c96a43; }
+
+  .btn-applied { display:inline-flex; align-items:center; gap:.35rem; background:#eafbf1; color:var(--cc-success); border:1.5px solid #b7e9cc; border-radius:8px; padding:.35rem .9rem; font-size:.82rem; font-weight:600; cursor:default; }
+
+  .btn-manage  { display:inline-flex; align-items:center; gap:.35rem; background:#eceef9; color:var(--cc-primary); border:1.5px solid #d0d5f5; border-radius:8px; padding:.35rem .9rem; font-size:.82rem; font-weight:600; text-decoration:none; }
+
+  .btn-hack-delete { display:inline-flex; align-items:center; gap:.3rem; background:none; border:1.5px solid transparent; border-radius:8px; padding:.35rem .6rem; font-size:.8rem; font-weight:600; color:var(--cc-muted); cursor:pointer; transition:all .16s; margin-left:auto; }
+  .btn-hack-delete:hover { border-color:#f5c6c0; color:var(--cc-danger); background:#fde8e8; }
+
+  /* Empty state */
+  .hack-empty { text-align:center; padding:4rem 1rem; color:var(--cc-muted); }
+  .hack-empty i { font-size:3.5rem; display:block; margin-bottom:.85rem; color:#d4b896; }
+  .hack-empty h3 { font-size:1.1rem; font-weight:600; margin-bottom:.4rem; color:var(--cc-text); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hack-wrap">
+
+  <div class="hack-topbar">
+    <h1 class="hack-title"><i class="bi bi-trophy-fill me-2" style="color:var(--cc-accent);"></i>Hackathon Team Finder</h1>
+    <p class="hack-sub">Find your perfect teammates for your next hackathon 🚀</p>
+  </div>
+
+  {% if posts %}
+    {% for post in posts %}
+    <div class="hack-card">
+
+      <!-- Members needed — top-left corner, small & muted -->
+      <span class="members-needed-badge">
+        <i class="bi bi-people me-1"></i>{{ post.members_needed }} member{% if post.members_needed != 1 %}s{% endif %} needed
+      </span>
+
+      <div class="hack-card-body">
+
+        <!-- Title -->
+        <h2 class="hack-main-title">{{ post.display_title }}</h2>
+        {% if post.team_name %}
+          <p class="hack-hackname"><i class="bi bi-award me-1"></i>{{ post.hackathon_name }}</p>
+        {% endif %}
+
+        <!-- Topic -->
+        {% if post.topic_decided %}
+          <div class="topic-box">
+            <p class="topic-box-label"><i class="bi bi-lightbulb me-1"></i>Problem Statement</p>
+            {% if post.theme %}
+              <p class="topic-box-theme">{{ post.theme }}</p>
+            {% endif %}
+            {% if post.problem_statement %}
+              <p class="topic-box-ps">{{ post.problem_statement }}</p>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="no-topic-badge">
+            <i class="bi bi-hourglass-split"></i> Problem statement not yet decided
+          </div>
+        {% endif %}
+
+        <!-- Team size info -->
+        <div style="display:flex;gap:1rem;margin-bottom:.85rem;flex-wrap:wrap;">
+          <span style="font-size:.8rem;color:var(--cc-muted);">
+            <i class="bi bi-people-fill me-1" style="color:var(--cc-primary);"></i>
+            <b style="color:var(--cc-text);">{{ post.existing_members_count }}</b> / {{ post.total_members }} members
+          </span>
+          <span style="font-size:.8rem;color:var(--cc-accent);font-weight:600;">
+            <i class="bi bi-person-plus me-1"></i>{{ post.members_needed }} spot{% if post.members_needed != 1 %}s{% endif %} open
+          </span>
+        </div>
+
+        <!-- Existing members -->
+        {% set existing = post.get_existing_members() %}
+        {% if existing %}
+          <div class="members-section">
+            <p class="members-label"><i class="bi bi-people me-1"></i>Current Team</p>
+            {% for m in existing %}
+              <span class="member-chip">
+                {% if m.is_leader %}<i class="bi bi-crown-fill leader-crown"></i>{% endif %}
+                <b>{{ m.name }}</b>
+                {% if m.description %}<span style="color:var(--cc-muted);font-size:.78rem;">— {{ m.description }}</span>{% endif %}
+              </span>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Required skills -->
+        {% if post.required_skills %}
+          <div class="skills-section">
+            <p class="skills-label"><i class="bi bi-stars me-1"></i>Looking For</p>
+            <p class="skills-text">{{ post.required_skills }}</p>
+          </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Card footer -->
+      <div class="hack-card-footer">
+        <span class="hack-author">
+          Posted by <b>@{{ post.author.username }}</b> · {{ post.timestamp.strftime('%d %b %Y') }}
+        </span>
+
+        {% if post.author_id == current_user.id %}
+          <a href="{{ url_for('applications') }}" class="btn-manage">
+            <i class="bi bi-people"></i> {{ post.application_count() }} applicant{% if post.application_count() != 1 %}s{% endif %}
+          </a>
+          <form method="POST" action="{{ url_for('delete_hackathon_post', post_id=post.id) }}" style="margin:0;margin-left:auto;"
+                onsubmit="return confirm('Delete this hackathon post?');">
+            <button type="submit" class="btn-hack-delete" title="Delete"><i class="bi bi-trash3"></i></button>
+          </form>
+        {% elif post.id in applied_ids %}
+          <span class="btn-applied ms-auto"><i class="bi bi-check-circle-fill"></i> Applied</span>
+        {% elif post.members_needed > 0 %}
+          <button class="btn-apply-open ms-auto" data-bs-toggle="collapse"
+                  data-bs-target="#apply-{{ post.id }}">
+            <i class="bi bi-send"></i> Apply to Join
+          </button>
+        {% else %}
+          <span style="font-size:.8rem;color:var(--cc-muted);margin-left:auto;font-weight:600;">
+            <i class="bi bi-lock me-1"></i>Team Full
+          </span>
+        {% endif %}
+      </div>
+
+      <!-- Apply collapse -->
+      {% if post.author_id != current_user.id and post.id not in applied_ids and post.members_needed > 0 %}
+      <div class="collapse apply-collapse" id="apply-{{ post.id }}">
+        <p style="font-size:.85rem;font-weight:600;color:var(--cc-accent);margin-bottom:.5rem;">
+          <i class="bi bi-people-fill me-1"></i>Join "{{ post.display_title }}"
+        </p>
+        <form method="POST" action="{{ url_for('apply_hackathon', post_id=post.id) }}">
+          <textarea name="message" placeholder="Tell the team about yourself — your skills, experience, availability, and why you'd be a great fit…" required></textarea>
+          <button type="submit" class="btn-apply-submit"><i class="bi bi-send me-2"></i>Submit Application</button>
+        </form>
+      </div>
+      {% endif %}
+
+    </div><!-- /hack-card -->
+    {% endfor %}
+
+  {% else %}
+    <div class="hack-empty">
+      <i class="bi bi-trophy"></i>
+      <h3>No team posts yet</h3>
+      <p>Be the first to post your hackathon team! Hit <i class="bi bi-plus-circle-fill"></i> in the sidebar and choose <strong>Find Hackathon Teammates</strong>.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

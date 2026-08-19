@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Feed{% endblock %}
+
+{% block extra_head %}
+<style>
+  .feed-wrap { padding: 1.5rem 1.75rem 4rem; max-width: 720px; margin: 0 auto; }
+
+  /* Top bar */
+  .feed-topbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .feed-title  { font-family:'Space Grotesk',sans-serif; font-size:1.35rem; font-weight:700; margin:0; color:var(--cc-text); }
+
+  /* View tabs */
+  .view-tabs  { display:inline-flex; background:var(--cc-border); border-radius:10px; padding:3px; gap:2px; }
+  .view-tab   { padding:.4rem 1rem; border-radius:8px; font-size:.85rem; font-weight:600; text-decoration:none; color:var(--cc-muted); transition:background .2s,color .2s; }
+  .view-tab.active { background:var(--cc-card); color:var(--cc-primary); box-shadow:var(--cc-shadow); }
+
+  /* Tag filter */
+  .tag-filters { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.25rem; }
+  .tag-pill { padding:.28rem .8rem; border-radius:100px; font-size:.78rem; font-weight:600; text-decoration:none; border:1.5px solid var(--cc-border); color:var(--cc-muted); background:var(--cc-card); transition:all .16s; }
+  .tag-pill:hover { border-color:var(--cc-primary); color:var(--cc-primary); }
+  .tag-pill.active { background:var(--cc-primary); border-color:var(--cc-primary); color:#fff; }
+  .tag-pill-clear { padding:.28rem .8rem; border-radius:100px; font-size:.78rem; font-weight:600; text-decoration:none; border:1.5px solid #f5c6c0; color:var(--cc-danger); background:var(--cc-card); transition:all .16s; }
+  .tag-pill-clear:hover { background:#fde8e8; }
+
+  /* Post card */
+  .post-card { background:var(--cc-card); border:1px solid var(--cc-border); border-radius:var(--cc-radius); box-shadow:var(--cc-shadow); margin-bottom:1.1rem; overflow:hidden; transition:box-shadow .2s; }
+  .post-card:hover { box-shadow:var(--cc-shadow-md); }
+
+  .post-card-header { padding:.85rem 1.15rem .75rem; display:flex; align-items:flex-start; gap:.7rem; }
+  .p-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--cc-primary),var(--cc-accent)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.82rem; flex-shrink:0; font-family:'Space Grotesk',sans-serif; }
+  .p-meta  { flex:1; min-width:0; }
+  .p-author { font-size:.85rem; font-weight:600; color:var(--cc-text); margin:0; }
+  .p-time   { font-size:.75rem; color:var(--cc-muted); margin:0; }
+
+  .badge-tag { background:var(--cc-accent-lt); color:var(--cc-accent); font-size:.72rem; font-weight:700; padding:.22rem .55rem; border-radius:6px; }
+
+  .post-card-body { padding:.75rem 1.15rem; }
+  .post-title { font-family:'Space Grotesk',sans-serif; font-size:.975rem; font-weight:600; margin:0 0 .4rem; color:var(--cc-text); }
+  .post-body  { font-size:.875rem; color:#3d3128; line-height:1.65; margin:0; white-space:pre-line; }
+
+  /* Action bar */
+  .post-actions { display:flex; align-items:center; gap:.45rem; padding:.55rem 1.15rem; border-top:1px solid var(--cc-border); background:#fdf9f4; flex-wrap:wrap; }
+
+  /* Comment toggle */
+  .btn-comment-toggle { display:inline-flex; align-items:center; gap:.35rem; background:none; border:1.5px solid var(--cc-border); border-radius:8px; padding:.3rem .75rem; font-size:.82rem; font-weight:600; color:var(--cc-muted); cursor:pointer; transition:all .16s; }
+  .btn-comment-toggle:hover { border-color:var(--cc-primary); color:var(--cc-primary); background:#eceef9; }
+
+  /* Delete button */
+  .btn-post-delete { display:inline-flex; align-items:center; gap:.3rem; background:none; border:1.5px solid transparent; border-radius:8px; padding:.3rem .6rem; font-size:.8rem; font-weight:600; color:var(--cc-muted); cursor:pointer; transition:all .16s; margin-left:auto; }
+  .btn-post-delete:hover { border-color:#f5c6c0; color:var(--cc-danger); background:#fde8e8; }
+
+  /* Collapsible section */
+  .collapsible-section { padding:.85rem 1.15rem; border-top:1px solid var(--cc-border); }
+
+  /* Comment item */
+  .comment-item { display:flex; gap:.6rem; margin-bottom:.75rem; }
+  .c-avatar { width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,#4a7c9e,var(--cc-primary)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.67rem; font-weight:700; flex-shrink:0; }
+  .c-bubble { background:var(--cc-bg); border:1px solid var(--cc-border); border-radius:10px; padding:.45rem .7rem; flex:1; }
+  .c-author  { font-size:.75rem; font-weight:700; color:var(--cc-text); margin-bottom:.1rem; }
+  .c-content { font-size:.84rem; color:#3d3128; margin:0; line-height:1.5; }
+  .c-vote-row { display:flex; gap:.3rem; margin-top:.35rem; }
+
+  /* Comment input */
+  .comment-input-row { display:flex; gap:.45rem; margin-top:.65rem; align-items:flex-end; }
+  .comment-input-row textarea { flex:1; resize:none; font-size:.875rem; border-radius:10px; border:1.5px solid var(--cc-border); padding:.45rem .7rem; min-height:56px; transition:border-color .2s; background:var(--cc-card); color:var(--cc-text); }
+  .comment-input-row textarea:focus { outline:none; border-color:var(--cc-primary); box-shadow:0 0 0 3px rgba(92,104,194,.1); }
+  .btn-send-comment { background:var(--cc-primary); color:#fff; border:none; border-radius:10px; padding:.45rem .9rem; font-size:.85rem; cursor:pointer; height:56px; transition:background .2s; }
+  .btn-send-comment:hover { background:var(--cc-primary-dk); }
+
+  /* Empty state */
+  .feed-empty { text-align:center; padding:4rem 1rem; color:var(--cc-muted); }
+  .feed-empty i { font-size:3rem; display:block; margin-bottom:.75rem; }
+  .feed-empty h3 { font-size:1.05rem; font-weight:600; margin-bottom:.4rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feed-wrap">
+
+  <!-- Top bar -->
+  <div class="feed-topbar">
+    <h1 class="feed-title"><i class="bi bi-house-heart me-2" style="color:var(--cc-accent);"></i>
+      {% if view == 'my' %}My Feed{% else %}All Posts{% endif %}
+    </h1>
+    <div class="view-tabs">
+      <a href="{{ url_for('feed', view='my', tag=tag_filter) }}"  class="view-tab {% if view=='my' %}active{% endif %}"><i class="bi bi-stars me-1"></i>Mine</a>
+      <a href="{{ url_for('feed', view='all', tag=tag_filter) }}" class="view-tab {% if view=='all' %}active{% endif %}"><i class="bi bi-globe me-1"></i>All</a>
+    </div>
+  </div>
+
+  <!-- Tag filters -->
+  <div class="tag-filters">
+    {% for tag in interests %}
+      <a href="{{ url_for('feed', view=view, tag=tag) }}"
+         class="tag-pill {% if tag_filter == tag %}active{% endif %}">{{ tag }}</a>
+    {% endfor %}
+    {% if tag_filter %}
+      <a href="{{ url_for('feed', view=view) }}" class="tag-pill-clear"><i class="bi bi-x me-1"></i>Clear</a>
+    {% endif %}
+  </div>
+
+  <!-- Posts -->
+  {% if posts %}
+    {% for post in posts %}
+    <div class="post-card">
+
+      <!-- Header -->
+      <div class="post-card-header">
+        <div class="p-avatar">
+          {% set nm = post.author.full_name or post.author.username %}
+          {% set pts = nm.split() %}
+          {% if pts|length >= 2 %}{{ pts[0][0]|upper }}{{ pts[1][0]|upper }}{% else %}{{ nm[:2]|upper }}{% endif %}
+        </div>
+        <div class="p-meta">
+          <p class="p-author">@{{ post.author.username }}</p>
+          <p class="p-time">{{ post.timestamp.strftime('%d %b %Y · %H:%M') }}</p>
+        </div>
+        <span class="badge-tag">{{ post.tag }}</span>
+      </div>
+
+      <!-- Body -->
+      <div class="post-card-body">
+        <p class="post-title">{{ post.title }}</p>
+        <p class="post-body">{{ post.body }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="post-actions">
+        {% set my_pv = user_post_votes.get(post.id, 0) %}
+
+        <!-- Vote pair (AJAX — no page reload) -->
+        <div style="display:flex;gap:.3rem;" data-vote-container>
+          <button class="vote-btn {% if my_pv == 1 %}vote-active-like{% endif %}"
+                  data-vote-val="1"
+                  onclick="castVote('post', {{ post.id }}, 1, this.closest('[data-vote-container]'))">
+            <i class="bi bi-hand-thumbs-up-fill"></i>
+            <span class="vc">{{ post.like_count() }}</span>
+          </button>
+          <button class="vote-btn {% if my_pv == -1 %}vote-active-dislike{% endif %}"
+                  data-vote-val="-1"
+                  onclick="castVote('post', {{ post.id }}, -1, this.closest('[data-vote-container]'))">
+            <i class="bi bi-hand-thumbs-down-fill"></i>
+            <span class="vc">{{ post.dislike_count() }}</span>
+          </button>
+        </div>
+
+        <!-- Comments toggle -->
+        <button class="btn-comment-toggle" data-bs-toggle="collapse" data-bs-target="#cmt-{{ post.id }}">
+          <i class="bi bi-chat-dots"></i>
+          <span>{{ post.comment_count() }}</span>
+        </button>
+
+        <!-- Delete (own posts only) -->
+        {% if post.author_id == current_user.id %}
+          <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}" style="margin:0;margin-left:auto;"
+                onsubmit="return confirm('Delete this post?');">
+            <button type="submit" class="btn-post-delete" title="Delete post">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+
+      <!-- Comments section (collapsible — stays open through AJAX votes) -->
+      <div class="collapse collapsible-section" id="cmt-{{ post.id }}">
+
+        {% if post.comments %}
+          {% for comment in post.comments %}
+          {% set my_cv = user_comment_votes.get(comment.id, 0) %}
+          <div class="comment-item">
+            <div class="c-avatar">
+              {% set cu = comment.author.full_name or comment.author.username %}{{ cu[:2]|upper }}
+            </div>
+            <div class="c-bubble">
+              <p class="c-author">
+                @{{ comment.author.username }}
+                <span style="color:var(--cc-muted);font-weight:400;font-size:.7rem;margin-left:.4rem;">{{ comment.timestamp.strftime('%d %b, %H:%M') }}</span>
+              </p>
+              <p class="c-content">{{ comment.content }}</p>
+              <!-- Comment vote (AJAX) -->
+              <div class="c-vote-row" data-vote-container>
+                <button class="comment-vote-btn {% if my_cv == 1 %}vote-active-like{% endif %}"
+                        data-vote-val="1"
+                        onclick="castVote('comment', {{ comment.id }}, 1, this.closest('[data-vote-container]'))">
+                  <i class="bi bi-hand-thumbs-up-fill"></i> <span class="vc">{{ comment.like_count() }}</span>
+                </button>
+                <button class="comment-vote-btn {% if my_cv == -1 %}vote-active-dislike{% endif %}"
+                        data-vote-val="-1"
+                        onclick="castVote('comment', {{ comment.id }}, -1, this.closest('[data-vote-container]'))">
+                  <i class="bi bi-hand-thumbs-down-fill"></i> <span class="vc">{{ comment.dislike_count() }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="font-size:.84rem;color:var(--cc-muted);margin-bottom:.65rem;">No comments yet. Be the first!</p>
+        {% endif %}
+
+        <!-- Comment input -->
+        <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}">
+          <div class="comment-input-row">
+            <textarea name="content" placeholder="Write a comment…" rows="2" required></textarea>
+            <button type="submit" class="btn-send-comment"><i class="bi bi-send-fill"></i></button>
+          </div>
+        </form>
+
+      </div>
+
+    </div><!-- /post-card -->
+    {% endfor %}
+
+  {% else %}
+    <div class="feed-empty">
+      <i class="bi bi-inbox"></i>
+      <h3>Nothing here yet</h3>
+      {% if view == 'my' %}
+        <p>No posts match your interests. Try <a href="{{ url_for('feed',view='all') }}" style="color:var(--cc-primary);">All Posts</a> or create one with <i class="bi bi-plus-circle-fill"></i> in the sidebar.</p>
+      {% else %}
+        <p>Be the first! Hit <i class="bi bi-plus-circle-fill"></i> in the sidebar to start a conversation.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
